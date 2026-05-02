@@ -203,142 +203,167 @@
                       <div class="directory-tree">
                           <pre>
 ecommerce_app                          
-  ├── README.md
-  ├── analysis_options.yaml
-  ├── android
-  ├── assets
-  │   ├── fonts
-  │   └── images
-  ├── devtools_options.yaml
-  ├── ios
-  ├── lib
-  │   ├── app
-  │   │   ├── app_link.dart
-  │   │   ├── app_routes.dart
-  │   │   ├── routes_auth.dart
-  │   │   ├── routes_homestay.dart
-  │   │   ├── routes_hotel.dart
-  │   │   ├── routes_payment.dart
-  │   │   ├── routes_profile.dart
-  │   │   ├── routes_ui_collection.dart
-  │   │   └── routes_workspace.dart
-  │   ├── constants
-  │   │   ├── amenity_const.dart
-  │   │   ├── app_const.dart
-  │   │   ├── booking_status.dart
-  │   │   ├── img_api.dart
-  │   │   ├── img_api_live.dart
-  │   │   └── regulation_const.dart
-  │   ├── main.dart
-  │   ├── models
-  │   │   ├── amenity.dart
-  │   │   ├── booking_homestay.dart
-  │   │   ├── booking_hotel.dart
-  │   │   ├── booking_workspace.dart
-  │   │   ├── category.dart
-  │   │   ├── chat.dart
-  │   │   ├── city.dart
-  │   │   ├── company.dart
-  │   │   ├── faq.dart
-  │   │   ├── general_list.dart
-  │   │   ├── homestay.dart
-  │   │   ├── hotel.dart
-  │   │   ├── hotel_room.dart
-  │   │   ├── list_item.dart
-  │   │   ├── news.dart
-  │   │   ├── notification.dart
-  │   │   ├── promo.dart
-  │   │   ├── rating.dart
-  │   │   ├── reward.dart
-  │   │   ├── reward_history.dart
-  │   │   ├── room_package.dart
-  │   │   ├── user.dart
-  │   │   ├── voucher.dart
-  │   │   ├── working_room.dart
-  │   │   └── workspace.dart
-  │   ├── screens
-  │   │   ├── auth
-  │   │   ├── booking
-  │   │   ├── explore
-  │   │   ├── home.dart
-  │   │   ├── homestay
-  │   │   ├── hotel
-  │   │   ├── intro
-  │   │   ├── messages
-  │   │   ├── not_found.dart
-  │   │   ├── payment
-  │   │   ├── profile
-  │   │   ├── promo
-  │   │   ├── review
-  │   │   ├── sample_ui
-  │   │   ├── search
-  │   │   └── workspace
-  │   ├── ui
-  │   │   ├── layouts
-  │   │   └── themes
-  │   ├── utils
-  │   │   ├── animated_slide_horizontal.dart
-  │   │   ├── bottom_draggable_sheet.dart
-  │   │   ├── check_platforms.dart
-  │   │   ├── col_row.dart
-  │   │   ├── color_type.dart
-  │   │   ├── confirm_dialog.dart
-  │   │   ├── custom_tooltip.dart
-  │   │   ├── expanded_section.dart
-  │   │   ├── gallery_viewer.dart
-  │   │   ├── grabber_icon.dart
-  │   │   ├── image_viewer.dart
-  │   │   ├── no_data.dart
-  │   │   ├── picker.dart
-  │   │   ├── placeholder.dart
-  │   │   ├── push_screen.dart
-  │   │   └── shimmer_preloader.dart
-  │   └── widgets
-  │       ├── action_header
-  │       ├── alert_info
-  │       ├── app_button
-  │       ├── app_input
-  │       ├── booking
-  │       ├── bottom_nav
-  │       ├── cards
-  │       ├── chat
-  │       ├── counter
-  │       ├── decorations
-  │       ├── details
-  │       ├── explore
-  │       ├── filter
-  │       ├── gallery
-  │       ├── home_screen
-  │       ├── homestay
-  │       ├── hotel
-  │       ├── notifications
-  │       ├── payment
-  │       ├── pricing
-  │       ├── profile
-  │       ├── promo
-  │       ├── review
-  │       ├── search
-  │       ├── settings
-  │       ├── stepper
-  │       ├── tab_menu
-  │       ├── title
-  │       ├── user
-  │       └── workspace
-  ├── linux
-  ├── macos
-  ├── pubspec.lock
-  ├── pubspec.yaml
-  ├── web
-  │   ├── favicon.png
-  │   ├── icons
-  │   │   ├── Icon-192.png
-  │   │   ├── Icon-512.png
-  │   │   ├── Icon-maskable-192.png
-  │   │   └── Icon-maskable-512.png
-  │   ├── index.html
-  │   ├── loading.gif
-  │   └── manifest.json
-  └── windows
+├── README.md
+├── analysis_options.yaml
+├── android
+├── assets
+│   ├── animations
+│   │   └── check.json
+│   ├── fonts
+│   └── images
+│       ├── 1.5x
+│       ├── 2.0x
+│       ├── 3.0x
+│       ├── 4.0x
+│       ├── app_logo.png
+│       ├── appstore.png
+│       ├── backgrounds
+│       ├── dummy
+│       ├── empty
+│       ├── icons
+│       ├── illustrations
+│       ├── intro
+│       ├── loading.gif
+│       ├── logos
+│       ├── master_card.png
+│       ├── playstore.png
+│       └── visa.png
+├── devtools_options.yaml
+├── ecommerce_app.iml
+├── ios
+├── lib
+│   ├── app
+│   │   ├── app_link.dart
+│   │   ├── app_routes.dart
+│   │   ├── routes_auth.dart
+│   │   ├── routes_feeds.dart
+│   │   ├── routes_product.dart
+│   │   ├── routes_profile.dart
+│   │   ├── routes_social.dart
+│   │   ├── routes_transaction.dart
+│   │   └── routes_ui_collection.dart
+│   ├── constants
+│   │   ├── app_const.dart
+│   │   ├── feature_const.dart
+│   │   ├── img_api.dart
+│   │   └── img_api_live.dart
+│   ├── controllers
+│   │   ├── history_filter_controller.dart
+│   │   ├── payment_type_controller.dart
+│   │   ├── product_filter_controller.dart
+│   │   └── skeleton_controller.dart
+│   ├── main.dart
+│   ├── models
+│   │   ├── address.dart
+│   │   ├── cart_item.dart
+│   │   ├── category_report.dart
+│   │   ├── chat.dart
+│   │   ├── company.dart
+│   │   ├── faq.dart
+│   │   ├── general_list.dart
+│   │   ├── list_item.dart
+│   │   ├── news.dart
+│   │   ├── notification.dart
+│   │   ├── post.dart
+│   │   ├── product.dart
+│   │   ├── product_category.dart
+│   │   ├── promo.dart
+│   │   ├── rating.dart
+│   │   ├── review.dart
+│   │   ├── reward.dart
+│   │   ├── reward_history.dart
+│   │   ├── shipment.dart
+│   │   ├── shop.dart
+│   │   ├── transaction.dart
+│   │   ├── user.dart
+│   │   └── voucher.dart
+│   ├── screens
+│   │   ├── auth
+│   │   ├── feeds
+│   │   ├── help_support
+│   │   ├── home.dart
+│   │   ├── intro
+│   │   ├── maintenance.dart
+│   │   ├── messages
+│   │   ├── not_found.dart
+│   │   ├── payment
+│   │   ├── products
+│   │   ├── profile
+│   │   ├── promo
+│   │   ├── review
+│   │   ├── sample_ui
+│   │   ├── search
+│   │   └── transactions
+│   ├── ui
+│   │   ├── layouts
+│   │   └── themes
+│   ├── utils
+│   │   ├── animated_slide_horizontal.dart
+│   │   ├── bottom_draggable_sheet.dart
+│   │   ├── check_platforms.dart
+│   │   ├── col_row.dart
+│   │   ├── color_type.dart
+│   │   ├── confirm_dialog.dart
+│   │   ├── custom_tooltip.dart
+│   │   ├── datepicker_range.dart
+│   │   ├── expanded_section.dart
+│   │   ├── formatter.dart
+│   │   ├── gallery_viewer.dart
+│   │   ├── grabber_icon.dart
+│   │   ├── image_viewer.dart
+│   │   ├── no_data.dart
+│   │   ├── picker.dart
+│   │   ├── placeholder.dart
+│   │   ├── push_screen.dart
+│   │   ├── rank_color.dart
+│   │   ├── screen_arguments.dart
+│   │   └── shimmer_preloader.dart
+│   └── widgets
+│       ├── action_header
+│       ├── alert_info
+│       ├── app_button
+│       ├── app_input
+│       ├── auth
+│       ├── bottom_nav
+│       ├── cards
+│       ├── chat
+│       ├── counter
+│       ├── decorations
+│       ├── faq
+│       ├── feeds
+│       ├── filters
+│       ├── gallery
+│       ├── header
+│       ├── home
+│       ├── notifications
+│       ├── payment
+│       ├── product
+│       ├── profile
+│       ├── promo
+│       ├── review
+│       ├── search
+│       ├── settings
+│       ├── skeleton
+│       ├── tab_menu
+│       ├── title
+│       ├── transactions
+│       ├── user
+│       └── wishlist
+├── linux
+├── macos
+├── pubspec.lock
+├── pubspec.yaml
+├── web
+│   ├── favicon.png
+│   ├── icons
+│   │   ├── Icon-192.png
+│   │   ├── Icon-512.png
+│   │   ├── Icon-maskable-192.png
+│   │   └── Icon-maskable-512.png
+│   ├── index.html
+│   ├── loading.gif
+│   └── manifest.json
+└── windows
                           </pre>
                       </div>
                     </div>
@@ -353,11 +378,11 @@ ecommerce_app
                         <hr />
                         <h3>Prerequisites</h3>
                         <ul class="wp-block-list">
-                          <li><a href="https://code.visualstudio.com/docs/setup/windows">Visual Studio Code</a> 1.86 or later with the <a href="https://marketplace.visualstudio.com/items?itemName=Dart-Code.flutter">Flutter extension for VS Code</a>.</li>
+                          <li><a href="https://code.visualstudio.com/docs/setup/windows">Visual Studio Code</a> 1.118.1 or later with the <a href="https://marketplace.visualstudio.com/items?itemName=Dart-Code.flutter">Flutter extension for VS Code</a>.</li>
                           <li>Xcode 16.2 for iOS build (For Mac OS only)</li>
                           <li><a href="https://developer.android.com/studio/archive" target="_blank" rel="noopener">Android Studio</a> Android Studio Ladybug Feature Drop | 2024.2.2 RC 2 December 16, 2024 (Recomended) </li>
                           
-                          <li>Flutter SDK setup (version 3.29.0 Stable)</li>
+                          <li>Flutter SDK setup (version 3.38.3 Stable)</li>
 
                           <li>JDK with path setup (only for vs code)</li>
 

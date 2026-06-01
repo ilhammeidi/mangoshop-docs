@@ -64,6 +64,9 @@
                     <a href="#install">Installation &amp; Running App</a>
                 </li>
                 <li>
+                    <a href="#backend">Backend Integrations</a>
+                </li>
+                <li>
                     <a href="#deploy">Build &amp; Deployment</a>
                 </li>
                 <li>
@@ -121,10 +124,10 @@
                         <hr />
                         <ul>
                             <li>
-                                Created : 12 May 2026
+                                Created : 24 May 2026
                             </li>
                             <li>
-                                Latest Update : 12 May 2026
+                                Latest Update : 24 May 2026
                             </li>
                         </ul>
                     </div>
@@ -1259,118 +1262,718 @@ ecommerce_app
                     </div>
                 </section>
                 <!-- END -->
+              
+                <!-- BACKEND INTEGTRATIONS -->
+                <section class="row" id="backend">
+                    <div class="col-lg-10">
+                        <h1>BACKEND INTEGRATIONS</h1>
+                        <br />
+                        <p>The template ships with a fully self-contained dummy data layer so every screen works out of the box — no server required. Every repository sits behind a Dart abstract interface class, which means switching from local fixtures to a live HTTP API requires zero changes to UI code.</p>
+                        <br />
+                        <h5>1. Setting the API Base URL</h5>
+                        <p>All network constants live in one place, Open file: <code>lib/constants/app_config.dart</code>. And set <code>apiBaseUrl</code> to point at your backend.</p>
+                    <pre class="language-js"><code class="language-js">// lib/constants/app_config.dart 
+abstract class AppConfig {
+// ── Replace with your server's base URL ────────────────────
+static const String apiBaseUrl = 'https://api.yourstore.com/v1';
+
+// Network timeouts (milliseconds)
+static const int connectTimeout = 10000;
+static const int receiveTimeout = 15000;
+}                        
+                    </code>
+                    </pre>
+                      
+                      <br />
+                      <h5>2. Understanding the Dummy Data Layer</h5>
+                      <p>Every feature repository has a corresponding dummy implementation that returns in-memory Dart objects with a simulated 300 ms delay. This is what runs when you first clone the template.</p>
+                      <pre class="language-js"><code class="language-js">// lib/data/interfaces/product_repository.dart
+abstract interface class ProductRepository {
+  Future&lt;List&lt;Product&gt;&gt; getProducts({
+    String? category,
+    int page  = 1,
+    int limit = 20,
+  });
+  Future&lt;Product&gt;  getProductById(String id);
+  Future&lt;List&lt;Product&gt;&gt; searchProducts(String query);
+}                      
+                      </code></pre>
+                      <br />
+                      <pre class="language-js"><code class="language-js"> // lib/data/repositories/dummy_product_repository.dart
+class DummyProductRepository implements ProductRepository {
+  final _items = DummyData.products;   // static list — no network
+
+  @override
+  Future&lt;List&lt;Product&gt;&gt; getProducts({
+    String? category, int page = 1, int limit = 20,
+  }) async {
+    await Future.delayed(const Duration(milliseconds: 300));
+    return category == null
+        ? _items
+        : _items.where((p) => p.category == category).toList();
+  }
+  // … other methods similarly
+}
+                      </code></pre>
+                      
+                      <br />
+                      <h5>3. Replacing with a Real API</h5>
+                      <p>Create a new class in <code>lib/data/repositories/</code> that implements the same interface, but calls your HTTP API via Dio.</p>
+                          Write the remote repository
+<pre class="language-js"><code class="language-js">// lib/data/repositories/remote_product_repository.dart
+class RemoteProductRepository implements ProductRepository {
+  const RemoteProductRepository(this._dio);
+  final Dio _dio;
+
+  @override
+  Future&lt;List&lt;Product&gt;&gt; getProducts({
+    String? category,
+    int page  = 1,
+    int limit = 20,
+  }) async {
+    try {
+      final res = await _dio.get&lt;Map&lt;String, dynamic&gt;&gt;(
+        '/products',
+        queryParameters: {
+          if (category != null) 'category': category,
+          'page': page,
+          'limit': limit,
+        },
+      );
+      final data = res.data!['data'] as List;
+      return data
+          .cast&lt;Map&lt;String, dynamic&gt;&gt;()
+          .map(Product.fromJson)
+          .toList();
+    } on DioException catch (e) {
+      throw ApiException.fromDio(e);  // map to domain error
+    }
+  }
+
+  @override
+  Future&lt;Product&gt; getProductById(String id) async {
+    final res = await _dio.get&lt;Map&lt;String, dynamic&gt;&gt;('/products/$id');
+    return Product.fromJson(res.data!);
+  }
+
+  @override
+  Future&lt;List&lt;Product&gt;&gt; searchProducts(String query) async {
+    final res = await _dio.get&lt;Map&lt;String, dynamic&gt;&gt;(
+      '/products/search',
+      queryParameters: {'q': query},
+    );
+    final data = res.data!['data'] as List;
+    return data.cast&lt;Map&lt;String, dynamic&gt;&gt;().map(Product.fromJson).toList();
+  }
+}
+</code></pre>
+                      
+                      <br />
+                      <h5>4. Models &amp; Serialisation</h5>
+                      Each model in <code>lib/models/</code> has a <code>fromJson</code> factory and a <code>toJson</code> method. Adjust the JSON keys to match whatever your API returns.
+                      <pre class="language-js"><code class="language-js">// lib/models/product.dart
+class Product {
+  const Product({
+    required this.id,
+    required this.name,
+    required this.price,
+    required this.imageUrl,
+    required this.category,
+  });
+
+  final String id;
+  final String name;
+  final double price;
+  final String imageUrl;
+  final String category;
+
+  // ── Adjust keys to match your API's JSON schema ────────────
+  factory Product.fromJson(Map&lt;String, dynamic&gt; j) => Product(
+    id:       j['id']         as String,
+    name:     j['name']       as String,
+    price:    (j['price']    as num).toDouble(),
+    imageUrl: j['image_url']  as String,   // snake_case API
+    category: j['category']   as String,
+  );
+
+  Map&lt;String, dynamic&gt; toJson() => {
+    'id':        id,
+    'name':      name,
+    'price':     price,
+    'image_url': imageUrl,
+    'category':  category,
+  };
+}                      
+                      </code></pre>
+                      <br />
+                      <h5>5. Authentication Overview</h5>
+                      <p>The template uses a standard JWT access/refresh token flow. The <code>AuthRepository</code> interface defines every auth operation; the dummy implementation accepts any credentials and returns a fake token.</p>
+                      <table class="tg">
+          <thead>
+            <tr>
+              <th>Method</th>
+              <th>Endpoint (example)</th>
+              <th>Returns</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>login(email, password)</code></td>
+              <td><code>POST /auth/login</code></td>
+              <td>access token + refresh token</td>
+            </tr>
+            <tr>
+              <td><code>register(name, email, pass)</code></td>
+              <td><code>POST /auth/register</code></td>
+              <td>user object + tokens</td>
+            </tr>
+            <tr>
+              <td><code>refreshToken(token)</code></td>
+              <td><code>POST /auth/refresh</code></td>
+              <td>new access token</td>
+            </tr>
+            <tr>
+              <td><code>logout()</code></td>
+              <td><code>POST /auth/logout</code></td>
+              <td>void — clears local tokens</td>
+            </tr>
+            <tr>
+              <td><code>getMe()</code></td>
+              <td><code>GET /auth/me</code></td>
+              <td>current user object</td>
+            </tr>
+          </tbody>
+        </table>
+                      
+                  <br />
+                  <h5>6. Implementing Real Authentication</h5>
+                  <ol>
+                    <li>
+                      <strong>Step 1 — Remote auth repository</strong>
+                      <p>In <code>lib/data/repositories/remote_auth_repository.dart</code> Please adjust your <strong>login</strong> and <strong>logout</strong> endpoint path </p>
+                      <pre class="language-js"><code class="language-js">// lib/data/repositories/remote_auth_repository.dart
+class RemoteAuthRepository implements AuthRepository {
+  RemoteAuthRepository(this._dio, this._storage);
+
+  ...
+  
+  /* Change your login endpoint path */
+  final String loginEndPoint = '/auth/login';
+  final String logoutEndPoint = '/auth/logout';
+
+  ...
+}
+                      </code></pre>
+                    </li>
+                    <li>
+                      <strong>Step 2 — Auth interceptor (auto-attach + refresh)</strong>
+                      <p>In <code>lib/network/auth_interceptor.dart</code> Please change your <strong>refresh</strong> endpoint path</p>
+                      <pre class="language-js"><code class="language-js">// lib/network/auth_interceptor.dart
+class AuthInterceptor extends Interceptor {
+  ...
+  
+  /* Change your refresh endpoint path */
+  final String refreshEndPoint = '/auth/refresh';
+  
+  Future&lt;bool&gt; _tryRefresh() async {
+    final rt = await _storage.getRefreshToken();
+    if (rt == null) return false;
+    try {
+      final res = await _dio.post&lt;Map&lt;String, dynamic&gt;&gt;(
+        refreshEndPoint,
+        data: {'refresh_token': rt},
+      );
+      await _storage.saveAccessToken(
+        res.data!['access_token'] as String,
+      );
+      return true;
+    } catch (_) {
+      await _storage.clearTokens(); // force re-login
+      return false;
+    }
+  }
+}
+                      </code></pre>
+                    </li>
+                    <li>
+                      <strong>Step 3 — User Model</strong>
+                      <p>Open <code>lib/models/user.dart</code> and adjust <strong>User</strong> attribute model</p>
+                      <pre class="language-js"><code class="language-js">class User {
+  /// User model representing a user in the application.
+  /// Please change the fields as needed to fit your application's requirements.
+  final String id;
+  final String name;
+  final String username;
+  final String title;
+  final String avatar;
+  final String dateOfBirth;
+  final String phone;
+  final String email;
+  final String country;
+  final String currency;
+  final String currencySymbol;
+  final bool isFavorited;
+
+  User({
+    required this.id,
+    required this.name,
+    this.username = '',
+    required this.title,
+    required this.avatar,
+    required this.dateOfBirth,
+    required this.phone,
+    required this.email,
+    required this.country,
+    this.currency = 'USD',
+    this.currencySymbol = '\$',
+    this.isFavorited = false,
+  });
+  
+  ...
+}
+                      
+                      </code></pre>
+                    </li>
+                  </ol>
+                      
+                  <p>Next, call it from widget. You can check the example implementation code in:</p>
+                  <ul>
+                    <li><strong>Login:</strong> lib/widgets/user/login_form.dart</li>
+                    <li><strong>Logout:</strong> lib/widgets/settings/setting_list.dart</li>
+                  </ul>
+                      
+                  <br />
+                  <h5>7. Secure Token Storage</h5>    
+                  <p>Auth tokens must <strong>never</strong> be stored in <code>SharedPreferences</code> — it writes plain text to disk and is trivially readable on rooted/jailbroken devices. <code>flutter_secure_storage</code> writes to the iOS Keychain and the Android Keystore-backed EncryptedSharedPreferences instead.</p>
+                  <ul>
+                    <li>
+                      Add the dependency
+                      <pre class="language-js"><code class="language-js">dependencies:
+    flutter_secure_storage: ^9.2.2                      
+                      </code></pre>
+                    </li>  
+                    <li>
+                      Platform prerequisites
+                      <ol class="steps">
+                        <li>
+                          <div><strong>Android</strong> — set <code>minSdkVersion 18</code> in
+                          <code>android/app/build.gradle</code>. This is already satisfied
+                          if you target a modern API level.</div>
+                        </li>
+                        <li>
+                          <div><strong>iOS</strong> — no extra steps. If you need tokens
+                          accessible across app extensions, enable Keychain Sharing in
+                          Xcode → Signing &amp; Capabilities.</div>
+                        </li>
+                        <li>
+                          <div><strong>Web</strong> — storage falls back to
+                          <code>localStorage</code> (not secure). For web targets, consider
+                          HttpOnly cookies set by the server instead.</div>
+                        </li>
+                      </ol>
+                    </li>
+                    <li>
+                      SecureStorage wrapper class
+                      <pre class="language-js"><code class="language-js">// lib/storage/secure_storage.dart
+class SecureStorage {
+  const SecureStorage(this._store);
+  final FlutterSecureStorage _store;
+
+  // ── Key constants ──────────────────────────────────────────
+  static const _kAccess  = 'access_token';
+  static const _kRefresh = 'refresh_token';
+
+  // ── Writes ─────────────────────────────────────────────────
+  Future&lt;void&gt; saveTokens({
+    required String accessToken,
+    required String refreshToken,
+  }) =>
+    Future.wait([
+      _store.write(key: _kAccess,  value: accessToken),
+      _store.write(key: _kRefresh, value: refreshToken),
+    ]);
+
+  Future&lt;void&gt; saveAccessToken(String t) =&gt;
+      _store.write(key: _kAccess, value: t);
+
+  // ── Reads ──────────────────────────────────────────────────
+  Future&lt;String?&gt; getAccessToken()  =&gt; _store.read(key: _kAccess);
+  Future&lt;String?&gt; getRefreshToken() =&gt; _store.read(key: _kRefresh);
+
+  // ── Wipe (always call on logout) ───────────────────────────
+  Future&lt;void&gt; clearTokens() => _store.deleteAll();
+}                 
+                      </code></pre>
+                    </li>
+                    <li>
+                      Security recommendations
+                      <table class="tg">
+          <thead>
+            <tr>
+              <th>Recommendation</th>
+              <th>Priority</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Use short-lived access tokens (≤ 15 min)</td>
+              <td><span class="p-tag high">Critical</span></td>
+              <td>Limits blast radius if a token is intercepted</td>
+            </tr>
+            <tr>
+              <td>Rotate refresh tokens on every use</td>
+              <td><span class="p-tag high">High</span></td>
+              <td>Server issues a new refresh token each time, invalidating the old one</td>
+            </tr>
+            <tr>
+              <td>Always call <code>clearTokens()</code> on logout</td>
+              <td><span class="p-tag high">High</span></td>
+              <td>Wipe keychain even when the server logout call fails</td>
+            </tr>
+            <tr>
+              <td>Set <code>synchronizable: false</code> (iOS)</td>
+              <td><span class="p-tag high">High</span></td>
+              <td>Prevents keychain items syncing to iCloud where they could be accessed from other devices</td>
+            </tr>
+            <tr>
+              <td>Enable <code>encryptedSharedPreferences</code> (Android)</td>
+              <td><span class="p-tag high">High</span></td>
+              <td>Wraps storage in AES-256 backed by Android Keystore</td>
+            </tr>
+            <tr>
+              <td>Enable certificate pinning in production</td>
+              <td><span class="p-tag med">Medium</span></td>
+              <td>Use <code>dio_certificate_pinning</code> or native TrustKit / Network Security Config</td>
+            </tr>
+            <tr>
+              <td>Gate sensitive screens with biometrics</td>
+              <td><span class="p-tag med">Medium</span></td>
+              <td>Use <code>local_auth</code> before displaying payment, orders, or profile data</td>
+            </tr>
+            <tr>
+              <td>Remove <code>LoggingInterceptor</code> in release builds</td>
+              <td><span class="p-tag med">Medium</span></td>
+              <td>Guard with <code>kReleaseMode</code> to avoid logging tokens to console</td>
+            </tr>
+            <tr>
+              <td>Enforce HTTPS in release — no plain HTTP</td>
+              <td><span class="p-tag low">Low</span></td>
+              <td>Android disallows cleartext traffic by default; verify <code>network_security_config.xml</code></td>
+            </tr>
+          </tbody>
+        </table>
+                    </li>
+                  </ul>
+                  </div>
+              </section>
+                <!-- END -->
 				
 				<!-- DEPLOYMENT APP -->
                 <section class="row" id="deploy">
                     <div class="col-lg-10">
                         <h1>Build &amp; Deployment</h1>
                         <hr />
-                        <h4>Build Android</h4>
-						<ol>
-                          <li>Open Terminal Console</li>
-                          <li>
-                            Run the following command to build the APK 
-                            <pre class="language-js"><code class="language-js">flutter build apk</code></pre>
+                        <ul class="nav nav-pills mb-3" id="pills-tab2" role="tablist">
+                          <li class="nav-item">
+                            <a class="nav-link active" id="pills-android-tab" data-toggle="pill" href="#build_android" role="tab" aria-controls="pills-home" aria-selected="true">ANDROID</a>
                           </li>
-                          <li>Wait until finish. And the APK built result will be placed in <code>build/app/outputs/flutter-apk/app-release.apk</code></li>
-                          <li>
-                            This command will compile your Flutter code and generate the APK file. You can find the APK in the build/app/outputs/flutter-apk directory inside your project folder. The APK file will be named something like app-release.apk or app-debug.apk.
+                          <li class="nav-item">
+                            <a class="nav-link" id="pills-ios-tab" data-toggle="pill" href="#build_ios" role="tab" aria-controls="pills-profile" aria-selected="false">IOS</a>
                           </li>
-                          <li>
-                            By using the above command, you will get a larger merged apk with this. But you can split them with this command
-                            <pre class="language-js"><code class="language-js">flutter build apk --target-platform android-arm,android-arm64,android-x64 --split-per-abi</code></pre>
+                          <li class="nav-item">
+                            <a class="nav-link" id="pills-web-tab" data-toggle="pill" href="#build_web" role="tab" aria-controls="pills-contact" aria-selected="false">WEB</a>
                           </li>
-                          <li>
-                            With this command, Flutter will generate three APKs, use one of them which is compatible with your device.
-                          </li>
-                          <li>
-                            When you're ready to prepare a <em>release</em> version of your app, for example to <a target="_blank" href="https://developer.android.com/distribute">publish to the Google Play Store</a>, this page can help. Before publishing, you might want to put some finishing touches on your app. This guide explains how to perform the following tasks:
-                            <br />
+                        </ul>
+                        <div class="tab-content" id="pills-tabContent2">
+                          <div class="tab-pane fade show active" id="build_android" role="tabpanel" aria-labelledby="pills-home-tab">
+                            <h5>1. Sign the app</h5>
+                            <p>To publish on the Play Store, you must sign your app with a digital certificate.</p>
+                            <p>Android uses two signing keys: upload and app signing.</p>
                             <ul>
-                              <li><a target="_blank" href="https://docs.flutter.dev/deployment/android#add-a-launcher-icon">Add a launcher icon</a></li>
-                              <li><a target="_blank" href="https://docs.flutter.dev/deployment/android#enable-material-components">Enable Material Components</a></li>
-                              <li><a target="_blank" href="https://docs.flutter.dev/deployment/android#sign-the-app">Sign the app</a></li>
-                              <li><a target="_blank" href="https://docs.flutter.dev/deployment/android#shrink-your-code-with-r8">Shrink your code with R8</a></li>
-                              <li><a target="_blank" href="https://docs.flutter.dev/deployment/android#enable-multidex-support">Enable multidex support</a></li>
-                              <li><a target="_blank" href="https://docs.flutter.dev/deployment/android#review-the-app-manifest">Review the app manifest</a></li>
-                              <li><a target="_blank" href="https://docs.flutter.dev/deployment/android#review-the-gradle-build-configuration">Review the build configuration</a></li>
-                              <li><a target="_blank" href="https://docs.flutter.dev/deployment/android#build-the-app-for-release">Build the app for release</a></li>
-                              <li><a target="_blank" href="https://docs.flutter.dev/deployment/android#publish-to-the-google-play-store">Publish to the Google Play Store</a></li>
-                              <li><a target="_blank" href="https://docs.flutter.dev/deployment/android#update-the-apps-version-number">Update the app's version number</a></li>
-                              <li><a target="_blank" href="https://docs.flutter.dev/deployment/android#android-release-faq">Android release FAQ</a></li>
+                              <li>
+                                Developers upload an <code>.aab</code> or <code>.apk</code> file signed with
+                                an <em>upload key</em> to the Play Store.
+                              </li>
+                              <li>The end-users download the <code>.apk</code> file signed with an <em>app signing key</em>.</li>
                             </ul>
-                          </li>
-                          <li>
-                            For more deploying documentations please follow this documentation: <a href="https://docs.flutter.dev/deployment/android" target="_blank" rel="noopener">https://docs.flutter.dev/deployment/android</a>&nbsp; &nbsp; &nbsp;&nbsp;&nbsp;
-                          </li>
-						</ol>
-                        <img src="images/build.png" width="500" alt="build" />
-                      
-                      
-                        <br />
-                        <br />
-                        <h4>Build iOS</h4>
-                        <ol>
-                          <li>
-                            Open Explorer File in VS Code. Right click on the <strong>ios</strong> folder
+                            <p>
+                              To create your app signing key, use Play App Signing
+                              as described in the <a href="https://support.google.com/googleplay/android-developer/answer/7384423?hl=en">official Play Store documentation</a>.
+                            </p>
+                            <p>To sign your app, use the following instructions.</p>
                             <br />
-                            <img src="images/ios.png" alt="ios" width="300" />
-                          </li>
-                          <li>
-                            It will open <strong>Xcode</strong>. On Left Sidebar click <strong>Runner</strong>.
-                            And then choose tab <strong>Signing &amp; Capabilities</strong> &gt; <strong>All</strong>
-                          </li>
-                          <li>
-                            Expand <strong>Signing</strong>, then Select <strong>Team</strong><br />
-                            <img src="images/xcode.png" alt="xcode" />
-                          </li>
-                          <li>Open terminal and locate to your project.</li>
-                          <li>
-                            Run the following command to build the <strong>Runner.app</strong>
-                            <pre class="language-js"><code class="language-js">flutter build ios</code></pre>
-                          </li>
-                          <li>
-                            Wait until finish. And the Runner.app built result will be placed in <code>build/ios/iphoneos/Runner.app</code>
-                            <img src="images/runner.png" width="500" alt="runner" />
-                          </li>
-                          <li>
-                            There is no general way to generate apps for iOS. Apple doesn’t allow you to install apps like this. If you want to install it on your iOS device, then you have to deploy it on <strong>TestFlight</strong> or <strong>AppStore</strong>. For deploying it, please follow this documentation: <a href="https://docs.flutter.dev/deployment/ios" target="_blank" rel="noopener">https://docs.flutter.dev/deployment/ios</a>&nbsp;
-                          </li>
-                        </ol>
-                        
-                        <br />
-                        <br />
-                        <h4>Build and Deploy Web</h4>
-                        <ol>
-                          <li>Open terminal and locate to your project.</li>
-                          <li>
-                            Run the following command to build the web app:
-                            <pre class="language-js"><code class="language-js">flutter build web</code></pre>
-                          </li>
-                          <li>
-                            Wait until finish. And the APK built result will be placed in <code>build/web</code>
-                            <img src="images/web.png" width="500" alt="web" />
-                          </li>
-                          <li>To deploy it, copy all files inside <strong>web/</strong> folder to your web server or cloud hosting</li>
-                          <li>
-                            When you are ready to deploy your app, upload the buld web release to Vercel or a similar service. Here are a few possibilities, but there are many others:
-                            <ul>
-                              <li><a href="https://vercel.com/">Vercel</a></li>
-                              <li><a href="https://www.netlify.com/">Netlify</a></li>
-                              <li><a href="https://pages.github.com/">GitHub Pages</a></li>
-                            </ul>
-                          </li>
-                          <li>
-                            Example with <strong>Vercel</strong>. Open terminal and locate your project, go to <code>build/web, and run this command:</code>
-                            <pre class="language-js"><code class="language-js">vercel deploy --prod</code></pre>
-                          </li>
-                          <li>
-                            Follow the instruction and wait until deployment finish.
+                            <h6>2.1. Create an upload keystore</h6>
+                            <p>
+                              If you have an existing keystore, skip to the next step.
+                              If not, create one using one of the following methods:
+                            </p>
+                            <ol>
+                              <li>
+                                <p>Follow the <a href="https://developer.android.com/studio/publish/app-signing#generate-key">Android Studio key generation steps</a>.</p>
+                              </li>
+                              <li>
+                                <p>Run the following command at the command line:</p><p>On macOS or Linux, use the following command:</p><div class="code-block-wrapper language-console"><div class="code-block-body"><pre class="opal" tabindex="0"><code><span class="line"><span><span>keytool -genkey -v -keystore ~/upload-keystore.jks -keyalg RSA \</span></span>
+</span><span class="line"><span><span>        -storetype JKS -keysize 2048 -validity 10000 -alias upload</span></span>
+</span></code></pre></div></div><p>On Windows, use the following command in PowerShell:</p><div class="code-block-wrapper language-ps"><div class="code-block-body"><pre class="opal" tabindex="0"><code><span class="line"><span><span>keytool -genkey -v -keystore $env:USERPROFILE\upload-keystore.jks `</span></span>
+</span><span class="line"><span><span>        -storetype JKS -keyalg RSA -keysize 2048 -validity 10000 `</span></span>
+</span><span class="line"><span><span>        -alias upload</span></span>
+</span></code></pre></div></div><p>This command stores the <code>upload-keystore.jks</code> file in your home
+                                  directory. If you want to store it elsewhere, change
+                                  the argument you pass to the <code>-keystore</code> parameter.
+                                  <strong>However, keep the <code>keystore</code> file private;
+                                    don't check it into public source control!</strong></p><aside class="alert alert-info"><div class="alert-header"><strong class="material-symbols" translate="no" aria-hidden="true">Info Note:</strong></div><div class="alert-content"><ul><li><p>The <code>keytool</code> command might not be in your path—it's
+                                          part of Java, which is installed as part of Android Studio.
+                                          For the concrete path, run <code>flutter doctor -v</code> and
+                                          locate the path printed after 'Java binary at:'.
+                                          Then use that fully qualified path
+                                          replacing <code>java</code> (at the end) with <code>keytool</code>.
+                                          If your path includes space-separated names, such as <code>Program Files</code>,
+                                          use platform-appropriate notation for the names.
+                                          For example, on macOS and Linux use <code>Program\ Files</code>, and
+                                          on Windows use <code>"Program Files"</code>.</p></li><li><p>The <code>-storetype JKS</code> tag is only required for Java 9
+                                          or newer. As of the Java 9 release,
+                                          the keystore type defaults to PKS12.</p></li></ul></div></aside>
+                              </li>
+                            </ol>
                             <br />
-                            <img src="images/vercel.png" width="500" alt="vercel" />
-                          </li>
-                          <li>Open production link in browser</li>
-                        </ol>
+                            <h6>2.2. Reference the keystore from the app</h6>
+                            <p>
+                              Rename file named <code>[project]/android/key.properties.example</code> to <code>key.properties</code>
+                              that contains a reference to your keystore.
+                              Don't include the angle brackets (<code>&lt; &gt;</code>).
+                              They indicate that the text serves as a placeholder for your values.
+                            </p>
+                            <div class="code-block-wrapper language-properties">
+                              <div class="code-block-body">
+                                <pre class="opal" tabindex="0"><code><span class="line"><span><span>storePassword=&lt;password-from-previous-step&gt;</span></span>
+</span><span class="line"><span><span>keyPassword=&lt;password-from-previous-step&gt;</span></span>
+</span><span class="line"><span><span>keyAlias=upload</span></span>
+</span><span class="line"><span><span>storeFile=&lt;keystore-file-location&gt;</span></span>
+</span></code></pre>
+                              </div>
+                            </div>
+                            <p>
+                              The <code>storeFile</code> might be located at
+                              <code>/Users/&lt;user name&gt;/upload-keystore.jks</code> on macOS
+                              or <code>C:\\Users\\&lt;user name&gt;\\upload-keystore.jks</code> on Windows.
+                            </p>
+                            <aside class="alert alert-info">
+                              <div class="alert-header"><span class="material-symbols" translate="no" aria-hidden="true">Info</span> <span>Note</span></div>
+                              <div class="alert-content">
+                                <p>
+                                  The Windows path to <code>keystore.jks</code> must be specified with double backslashes: <code>\\</code>.
+                                </p>
+                              </div>
+                            </aside>
+                            <aside class="alert alert-warning">
+                              <div class="alert-header"><span class="material-symbols" translate="no" aria-hidden="true">Warning</span></div>
+                              <div class="alert-content">
+                                <p>
+                                  Keep the <code>key.properties</code> file private;
+                                  don't check it into public source control.
+                                </p>
+                              </div>
+                            </aside>
+                            
+                        <p>Flutter now signs all release builds.</p>
+                        <aside class="alert alert-info">
+                          <div class="alert-header"><span class="material-symbols" translate="no" aria-hidden="true">Info</span> <span>Note</span></div>
+                          <div class="alert-content">
+                            <p>
+                              You might need to run <code>flutter clean</code> after changing the Gradle file.
+                              This prevents cached builds from affecting the signing process.
+                            </p>
+                          </div>
+                        </aside>
+                        <p>
+                          To learn more about signing your app, check out
+                          <a href="https://developer.android.com/studio/publish/app-signing.html#generate-key">Sign your app</a>
+                           on the Android developer docs.
+                        </p>
+
+                            <br />
+                            
+                            <h5>2. Build APK</h5>
+                            <ol>
+                              <li>Open Terminal Console</li>
+                              <li>
+                                Run the following command to build the APK 
+                                <pre class="language-js"><code class="language-js">flutter build apk</code></pre>
+                              </li>
+                              <li>Wait until finish. And the APK built result will be placed in <code>build/app/outputs/flutter-apk/app-release.apk</code></li>
+                              <li>
+                                This command will compile your Flutter code and generate the APK file. You can find the APK in the <code>build/app/outputs/flutter-apk/app-release.apk</code>.
+                                <img src="images/build.png" width="500" alt="build" />
+                              </li>
+                              <li>
+                                By using the above command, you will get a larger merged apk with this. But you can split them with this command
+                                <pre class="language-js"><code class="language-js">flutter build apk --target-platform android-arm,android-arm64,android-x64 --split-per-abi</code></pre>
+                              </li>
+                              <li>
+                                With this command, Flutter will generate three APKs, use one of them which is compatible with your device.
+                              </li>
+                            </ol>
+                            <br />
+                            
+                            <h5>3. More references</h5>
+                            <p>
+                              When you're ready to prepare a <em>release</em> version of your app, for example to <a target="_blank" href="https://developer.android.com/distribute">publish to the Google Play Store</a>, this page can help. Before publishing, you might want to put some finishing touches on your app. This guide explains how to perform the following tasks:
+                            </p>
+                              <ul>
+                                <li><a target="_blank" href="https://docs.flutter.dev/deployment/android#add-a-launcher-icon">Add a launcher icon</a></li>
+                                <li><a target="_blank" href="https://docs.flutter.dev/deployment/android#enable-material-components">Enable Material Components</a></li>
+                                <li><a target="_blank" href="https://docs.flutter.dev/deployment/android#sign-the-app">Sign the app</a></li>
+                                <li><a target="_blank" href="https://docs.flutter.dev/deployment/android#shrink-your-code-with-r8">Shrink your code with R8</a></li>
+                                <li><a target="_blank" href="https://docs.flutter.dev/deployment/android#enable-multidex-support">Enable multidex support</a></li>
+                                <li><a target="_blank" href="https://docs.flutter.dev/deployment/android#review-the-app-manifest">Review the app manifest</a></li>
+                                <li><a target="_blank" href="https://docs.flutter.dev/deployment/android#review-the-gradle-build-configuration">Review the build configuration</a></li>
+                                <li><a target="_blank" href="https://docs.flutter.dev/deployment/android#build-the-app-for-release">Build the app for release</a></li>
+                                <li><a target="_blank" href="https://docs.flutter.dev/deployment/android#publish-to-the-google-play-store">Publish to the Google Play Store</a></li>
+                                <li><a target="_blank" href="https://docs.flutter.dev/deployment/android#update-the-apps-version-number">Update the app's version number</a></li>
+                                <li><a target="_blank" href="https://docs.flutter.dev/deployment/android#android-release-faq">Android release FAQ</a></li>
+                              </ul>
+                            </li>
+                            <p>
+                              For more deploying documentations please follow this reference: <a href="https://docs.flutter.dev/deployment/android" target="_blank" rel="noopener">https://docs.flutter.dev/deployment/android</a>&nbsp; &nbsp; &nbsp;&nbsp;&nbsp;
+                            </p>
+                          </div>
+
+                          <div class="tab-pane fade show" id="build_ios" role="tabpanel" aria-labelledby="pills-home-tab">
+                            <h5>1. Build iOS</h5>
+                            <ol>
+                              <li>
+                                Open Explorer File in VS Code. Right click on the <strong>ios</strong> folder
+                                <br />
+                                <img src="images/ios.png" alt="ios" width="300" />
+                              </li>
+                              <li>
+                                It will open <strong>Xcode</strong>. On Left Sidebar click <strong>Runner</strong>.
+                                And then choose tab <strong>Signing &amp; Capabilities</strong> &gt; <strong>All</strong>
+                              </li>
+                              <li>
+                                Expand <strong>Signing</strong>, then Select <strong>Team</strong><br />
+                                <img src="images/xcode.png" alt="xcode" />
+                              </li>
+                              <li>Open terminal and locate to your project.</li>
+                              <li>
+                                Run the following command to build the <strong>Runner.app</strong>
+                                <pre class="language-js"><code class="language-js">flutter build ios</code></pre>
+                              </li>
+                              <li>
+                                Wait until finish. And the Runner.app built result will be placed in <code>build/ios/iphoneos/Runner.app</code>
+                                <img src="images/runner.png" width="500" alt="runner" />
+                              </li>
+                              <li>
+                                There is no general way to generate apps for iOS. Apple doesn’t allow you to install apps like this. If you want to install it on your iOS device, then you have to deploy it on <strong>TestFlight</strong> or <strong>AppStore</strong>. For deploying it, please follow this documentation: <a href="https://docs.flutter.dev/deployment/ios" target="_blank" rel="noopener">https://docs.flutter.dev/deployment/ios</a>&nbsp;
+                              </li>
+                            </ol>
+                            <br />
+
+                            <h5>2. Register your app</h5>
+                            <p>
+                  Manage your app's life cycle on
+                  <a href="https://developer.apple.com/support/app-store-connect/">App Store Connect</a>
+                   (formerly iTunes Connect).
+                  You define your app name and description, add screenshots,
+                  set pricing, and manage releases to the App Store and TestFlight.
+                </p>
+                <p>
+                  Registering your app involves two steps: registering a unique
+                  Bundle ID, and creating an application record on App Store Connect.
+                </p>
+                <p>
+                  For a detailed overview of App Store Connect, see the
+                  <a href="https://developer.apple.com/support/app-store-connect/">App Store Connect</a>
+                   guide.
+                </p>
+
+                <br />
+                <h6>1. Register a Bundle ID</h6>
+                <p>
+                  Every iOS application is associated with a Bundle ID,
+                  a unique identifier registered with Apple.
+                  To register a Bundle ID for your app, follow these steps:
+                </p>
+                <ol>
+                  <li>
+                    Open the <a href="https://developer.apple.com/account/ios/identifier/bundle">App IDs</a> page of your developer account.
+                  </li>
+                  <li>Click <strong>+</strong> to create a new Bundle ID.</li>
+                  <li>Enter an app name, select <strong>Explicit App ID</strong>, and enter an ID.</li>
+                  <li>Select the services your app uses, then click <strong>Continue</strong>.</li>
+                  <li>
+                    On the next page, confirm the details and click <strong>Register</strong>
+                    to register your Bundle ID.
+                  </li>
+                </ol>
+                <br />
+
+                <h6>2. Create an application record on App Store Connect</h6>
+                <p>Register your app on App Store Connect:</p>
+                <ol>
+                  <li>Open <a href="https://appstoreconnect.apple.com/">App Store Connect</a> in your browser.</li>
+                  <li>On the App Store Connect landing page, click <strong>Apps</strong>.</li>
+                  <li>
+                    Click <strong>+</strong> in the top-left corner,
+                    then select <strong>New App</strong>.
+                  </li>
+                  <li>
+                    Fill in your app details in the form that appears.
+                    In the Platforms section, ensure that iOS is checked.
+                    Since Flutter does not currently support tvOS,
+                    leave that checkbox unchecked. Click <strong>Create</strong>.
+                  </li>
+                  <li>
+                    Navigate to the application details for your app and select
+                    <strong>App Information</strong> from the sidebar.
+                  </li>
+                  <li>
+                    In the General Information section, select the Bundle ID
+                    you registered in the preceding step.
+                  </li>
+                </ol>
+                <p>
+                  For a detailed overview, see
+                  <a href="https://help.apple.com/app-store-connect/#/dev2cd126805">Add an app to your account</a>.
+                </p>
+
+                          </div>
+
+                          <div class="tab-pane fade show" id="build_web" role="tabpanel" aria-labelledby="pills-home-tab">
+                            <h5>Build and Deploy Web</h5>
+                            <ol>
+                              <li>Open terminal and locate to your project.</li>
+                              <li>
+                                Run the following command to build the web app:
+                                <pre class="language-js"><code class="language-js">flutter build web</code></pre>
+                              </li>
+                              <li>
+                                Wait until finish. And the APK built result will be placed in <code>build/web</code>
+                                <img src="images/web.png" width="500" alt="web" />
+                              </li>
+                              <li>To deploy it, copy all files inside <strong>web/</strong> folder to your web server or cloud hosting</li>
+                              <li>
+                                When you are ready to deploy your app, upload the buld web release to Vercel or a similar service. Here are a few possibilities, but there are many others:
+                                <ul>
+                                  <li><a href="https://vercel.com/">Vercel</a></li>
+                                  <li><a href="https://www.netlify.com/">Netlify</a></li>
+                                  <li><a href="https://pages.github.com/">GitHub Pages</a></li>
+                                </ul>
+                              </li>
+                              <li>
+                                Example with <strong>Vercel</strong>. Open terminal and locate your project, go to <code>build/web, and run this command:</code>
+                                <pre class="language-js"><code class="language-js">vercel deploy --prod</code></pre>
+                              </li>
+                              <li>
+                                Follow the instruction and wait until deployment finish.
+                                <br />
+                                <img src="images/vercel.png" width="500" alt="vercel" />
+                              </li>
+                              <li>Open production link in browser</li>
+                            </ol>
+                          </div>
+                        </div>
                         
                     </div>
                 </section>
@@ -2240,7 +2843,7 @@ Container(
                             <thead>
                               <tr>
                                 <th>
-                                    <strong>Version 1.0.0 – 7 May, 2026</strong>
+                                    <strong>Version 1.0.0 – 24 May, 2026</strong>
                                 </th>
                               </tr>
                             </thead>

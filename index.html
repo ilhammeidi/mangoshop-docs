@@ -124,10 +124,10 @@
                         <hr />
                         <ul>
                             <li>
-                                Created : 24 May 2026
+                                Created : 7 May 2026
                             </li>
                             <li>
-                                Latest Update : 24 May 2026
+                                Latest Update : 7 May 2026
                             </li>
                         </ul>
                     </div>
@@ -381,9 +381,9 @@ ecommerce_app
                         <hr />
                         <h3>Prerequisites</h3>
                         <ul class="wp-block-list">
-                          <li><a href="https://code.visualstudio.com/docs/setup/windows">Visual Studio Code</a> 1.118.1 or later with the <a href="https://marketplace.visualstudio.com/items?itemName=Dart-Code.flutter">Flutter extension for VS Code</a>.</li>
+                          <li><a href="https://code.visualstudio.com/docs/setup/windows" target="_blank">Visual Studio Code</a> with the <a href="https://marketplace.visualstudio.com/items?itemName=Dart-Code.flutter">Flutter extension for VS Code</a>.</li>
                           <li>Xcode 16.2 for iOS build (For Mac OS only)</li>
-                          <li><a href="https://developer.android.com/studio/archive" target="_blank" rel="noopener">Android Studio</a> Android Studio Ladybug Feature Drop | 2024.2.2 RC 2 December 16, 2024 (Recomended) </li>
+                          <li><a href="https://developer.android.com/studio" target="_blank" rel="noopener">Android Studio</a></li>
                           
                           <li>Flutter SDK setup (version 3.38.3 Stable)</li>
 
@@ -412,7 +412,7 @@ ecommerce_app
                             <ol>
                               <li>Download Android Studio
                               <ul class="wp-block-list">
-                              <li>Visit the <a href="https://developer.android.com/studio/archive" target="_blank" rel="noopener">official Android Studio download page and download</a> (<strong>Android Studio Ladybug Feature Drop | 2024.2.2 RC 2 December 16, 2024</strong>)</li>
+                              <li>Visit the <a href="https://developer.android.com/studio" target="_blank" rel="noopener">official Android Studio download page and download</a></li>
 
 
 
@@ -546,7 +546,6 @@ ecommerce_app
                                     </li>
                                     <li>
                                       <p>If you do not have the Flutter SDK installed, click <strong>Download SDK</strong>.</p>
-                                      <p>This option sends you the Flutter install page if you have not installed Git for Windows as directed in the <a target="_blank" href="https://docs.flutter.dev/get-started/install/windows/mobile#development-tools">development tools prerequisites</a>.</p>
                                       <ol>
                                         <li>
                                           <p>VS Code places you in your user profile to start. Choose a different location.</p>
@@ -1220,7 +1219,7 @@ ecommerce_app
                         <hr />
                         <h3>Install Dependencies</h3>
                         <br />
-                        Mangoshop is built on <a href="https://flutter.dev/" target="_blank">Flutter</a>. To begin, it’s essential to verify that your Flutter and Integrated Development Environment (IDE) setup has been configured accurately
+                        Mangoshop is built on Flutter, to begin, it’s essential to verify that your Flutter and Integrated Development Environment (IDE) setup has been configured accurately
 						<ul>
                           <li>Connect to the internet</li>
                           <li>Execute the command <kbd>flutter doctor</kbd> in your terminal. If any issues arise during this process, make sure to address and resolve them promptly.</li>
@@ -1710,9 +1709,6 @@ class SecureStorage {
                             </p>
                             <ol>
                               <li>
-                                <p>Follow the <a href="https://developer.android.com/studio/publish/app-signing#generate-key">Android Studio key generation steps</a>.</p>
-                              </li>
-                              <li>
                                 <p>Run the following command at the command line:</p><p>On macOS or Linux, use the following command:</p><div class="code-block-wrapper language-console"><div class="code-block-body"><pre class="opal" tabindex="0"><code><span class="line"><span><span>keytool -genkey -v -keystore ~/upload-keystore.jks -keyalg RSA \</span></span>
 </span><span class="line"><span><span>        -storetype JKS -keysize 2048 -validity 10000 -alias upload</span></span>
 </span></code></pre></div></div><p>On Windows, use the following command in PowerShell:</p><div class="code-block-wrapper language-ps"><div class="code-block-body"><pre class="opal" tabindex="0"><code><span class="line"><span><span>keytool -genkey -v -keystore $env:USERPROFILE\upload-keystore.jks `</span></span>
@@ -1786,11 +1782,6 @@ class SecureStorage {
                             </p>
                           </div>
                         </aside>
-                        <p>
-                          To learn more about signing your app, check out
-                          <a href="https://developer.android.com/studio/publish/app-signing.html#generate-key">Sign your app</a>
-                           on the Android developer docs.
-                        </p>
 
                             <br />
                             
@@ -1815,28 +1806,6 @@ class SecureStorage {
                               </li>
                             </ol>
                             <br />
-                            
-                            <h5>3. More references</h5>
-                            <p>
-                              When you're ready to prepare a <em>release</em> version of your app, for example to <a target="_blank" href="https://developer.android.com/distribute">publish to the Google Play Store</a>, this page can help. Before publishing, you might want to put some finishing touches on your app. This guide explains how to perform the following tasks:
-                            </p>
-                              <ul>
-                                <li><a target="_blank" href="https://docs.flutter.dev/deployment/android#add-a-launcher-icon">Add a launcher icon</a></li>
-                                <li><a target="_blank" href="https://docs.flutter.dev/deployment/android#enable-material-components">Enable Material Components</a></li>
-                                <li><a target="_blank" href="https://docs.flutter.dev/deployment/android#sign-the-app">Sign the app</a></li>
-                                <li><a target="_blank" href="https://docs.flutter.dev/deployment/android#shrink-your-code-with-r8">Shrink your code with R8</a></li>
-                                <li><a target="_blank" href="https://docs.flutter.dev/deployment/android#enable-multidex-support">Enable multidex support</a></li>
-                                <li><a target="_blank" href="https://docs.flutter.dev/deployment/android#review-the-app-manifest">Review the app manifest</a></li>
-                                <li><a target="_blank" href="https://docs.flutter.dev/deployment/android#review-the-gradle-build-configuration">Review the build configuration</a></li>
-                                <li><a target="_blank" href="https://docs.flutter.dev/deployment/android#build-the-app-for-release">Build the app for release</a></li>
-                                <li><a target="_blank" href="https://docs.flutter.dev/deployment/android#publish-to-the-google-play-store">Publish to the Google Play Store</a></li>
-                                <li><a target="_blank" href="https://docs.flutter.dev/deployment/android#update-the-apps-version-number">Update the app's version number</a></li>
-                                <li><a target="_blank" href="https://docs.flutter.dev/deployment/android#android-release-faq">Android release FAQ</a></li>
-                              </ul>
-                            </li>
-                            <p>
-                              For more deploying documentations please follow this reference: <a href="https://docs.flutter.dev/deployment/android" target="_blank" rel="noopener">https://docs.flutter.dev/deployment/android</a>&nbsp; &nbsp; &nbsp;&nbsp;&nbsp;
-                            </p>
                           </div>
 
                           <div class="tab-pane fade show" id="build_ios" role="tabpanel" aria-labelledby="pills-home-tab">
@@ -1865,7 +1834,7 @@ class SecureStorage {
                                 <img src="images/runner.png" width="500" alt="runner" />
                               </li>
                               <li>
-                                There is no general way to generate apps for iOS. Apple doesn’t allow you to install apps like this. If you want to install it on your iOS device, then you have to deploy it on <strong>TestFlight</strong> or <strong>AppStore</strong>. For deploying it, please follow this documentation: <a href="https://docs.flutter.dev/deployment/ios" target="_blank" rel="noopener">https://docs.flutter.dev/deployment/ios</a>&nbsp;
+                                There is no general way to generate apps for iOS. Apple doesn’t allow you to install apps like this. If you want to install it on your iOS device, then you have to deploy it on <strong>TestFlight</strong> or <strong>AppStore</strong>. For deploying it.
                               </li>
                             </ol>
                             <br />
@@ -1873,7 +1842,7 @@ class SecureStorage {
                             <h5>2. Register your app</h5>
                             <p>
                   Manage your app's life cycle on
-                  <a href="https://developer.apple.com/support/app-store-connect/">App Store Connect</a>
+                  <strong>App Store Connect</strong>
                    (formerly iTunes Connect).
                   You define your app name and description, add screenshots,
                   set pricing, and manage releases to the App Store and TestFlight.
@@ -1881,11 +1850,6 @@ class SecureStorage {
                 <p>
                   Registering your app involves two steps: registering a unique
                   Bundle ID, and creating an application record on App Store Connect.
-                </p>
-                <p>
-                  For a detailed overview of App Store Connect, see the
-                  <a href="https://developer.apple.com/support/app-store-connect/">App Store Connect</a>
-                   guide.
                 </p>
 
                 <br />
@@ -1897,7 +1861,7 @@ class SecureStorage {
                 </p>
                 <ol>
                   <li>
-                    Open the <a href="https://developer.apple.com/account/ios/identifier/bundle">App IDs</a> page of your developer account.
+                    Open the <strong>App IDs</strong> page of your developer account.
                   </li>
                   <li>Click <strong>+</strong> to create a new Bundle ID.</li>
                   <li>Enter an app name, select <strong>Explicit App ID</strong>, and enter an ID.</li>
@@ -1933,12 +1897,7 @@ class SecureStorage {
                     you registered in the preceding step.
                   </li>
                 </ol>
-                <p>
-                  For a detailed overview, see
-                  <a href="https://help.apple.com/app-store-connect/#/dev2cd126805">Add an app to your account</a>.
-                </p>
-
-                          </div>
+            </div>
 
                           <div class="tab-pane fade show" id="build_web" role="tabpanel" aria-labelledby="pills-home-tab">
                             <h5>Build and Deploy Web</h5>
@@ -1956,9 +1915,9 @@ class SecureStorage {
                               <li>
                                 When you are ready to deploy your app, upload the buld web release to Vercel or a similar service. Here are a few possibilities, but there are many others:
                                 <ul>
-                                  <li><a href="https://vercel.com/">Vercel</a></li>
-                                  <li><a href="https://www.netlify.com/">Netlify</a></li>
-                                  <li><a href="https://pages.github.com/">GitHub Pages</a></li>
+                                  <li><a href="https://vercel.com/" target="_blank">Vercel</a></li>
+                                  <li><a href="https://www.netlify.com/" target="_blank">Netlify</a></li>
+                                  <li><a href="https://pages.github.com/" target="_blank">GitHub Pages</a></li>
                                 </ul>
                               </li>
                               <li>
@@ -2118,7 +2077,6 @@ Expand Signing, then Select Team
                           This template uses <strong>GetX</strong>, so we added "Get" before your MaterialApp, turning it into GetMaterialApp.
                           This does not modify the MaterialApp of the Flutter, GetMaterialApp is not a modified MaterialApp, it is just a pre-configured Widget, which has the default MaterialApp as a child. 
                           GetMaterialApp is necessary for routes, snackbars, internationalization, bottomSheets, dialogs, and high-level apis related to routes and absence of context.
-                          <a href="https://pub.dev/packages/get" target="_blank">See more references about GetX</a>
                         </p>
                     </div>
                 </section>
@@ -2202,8 +2160,6 @@ Company branding = Company(
                       <br />
                       <img src="images/stl.png" alt="stl" width="500" />
                       <br />
-                      Here's the references for Flutter Widget type: <a target="_blank" href="https://docs.flutter.dev/ui/interactivity#stateful-and-stateless-widgets">https://docs.flutter.dev/ui/interactivity#stateful-and-stateless-widgets</a>
-                      <br />
                     </li>
                     <li>
                       In this documentation, lets choose Flutter Stateless Widget. And will autometically generated this code
@@ -2263,8 +2219,6 @@ class MyWidget extends StatelessWidget {
                       Then the autocomplete options will show and choose <strong>Flutter Stateless Widget</strong> or <strong>Flutter Stateful Widget</strong>
                       <br />
                       <img src="images/stl.png" alt="stl" width="500" />
-                      <br />
-                      Here's the references for Flutter Widget type: <a target="_blank" href="https://docs.flutter.dev/ui/interactivity#stateful-and-stateless-widgets">https://docs.flutter.dev/ui/interactivity#stateful-and-stateless-widgets</a>
                       <br />
                     </li>
                     <li>
@@ -2687,7 +2641,7 @@ Container(
                             <br />
                             <a href="http://unsplash.com/" target="_blank">Unsplash</a><br />
                             <a href="https://pixabay.com/" target="_blank">Pixabay</a><br />
-                            <a href="https://randomuser.me//" target="_blank">randomuser.me</a><br /><br />
+                            <a href="https://randomuser.me/" target="_blank">Random User Generator</a><br /><br />
                             <blockquote>Note: All images are just used for Preview Purpose Only. They are not part of the template and NOT included in the final purchase files.</blockquote>
                             <br /><br />
                             <strong>Credits</strong>
@@ -2815,25 +2769,6 @@ Container(
                 </section>
                 <!-- END -->
 
-                <!-- SUPPORT -->
-                <section class="row" id="support">
-                    <div class="col-lg-10">
-                        <h1>Online Suport</h1>
-                        <hr />
-                        <p>
-                             If you have any questions about customization of this template wich are not covered in the documentation feel free to ask a question in the comment section or contact me directly via e-mail form on my profile page.
-                        </p>
-                        <p>
-                            A product by <a href="https://themeforest.net/user/ilhammeidi" target="_blank">Ilham Meidi Brata</a>
-                        </p>
-                        <br /><br />
-                        <blockquote>
-                            <h4>Enjoy and don’t forget to rate my template. <br /> <br /> Thank you very much!</h4>
-                        </blockquote>
-                    </div>
-                </section>
-                <!-- END -->
-
                 <!-- Log -->
                 <section class="row" id="log">
                     <div class="col-lg-10">
@@ -2843,7 +2778,7 @@ Container(
                             <thead>
                               <tr>
                                 <th>
-                                    <strong>Version 1.0.0 – 24 May, 2026</strong>
+                                    <strong>Version 1.0.0 – 7 May, 2026</strong>
                                 </th>
                               </tr>
                             </thead>

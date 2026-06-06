@@ -17,10 +17,11 @@
  }
 
 a{
-    color: #00ad96;
+    color: #08acd3;
+    text-decoration: underline;
 }
 a:hover{
-    color: #00ad96;
+    color: #35bfe0;
 }
 
 code {
